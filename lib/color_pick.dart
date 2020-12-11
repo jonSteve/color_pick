@@ -47,6 +47,7 @@ class ColorPickState extends State<ColorPickView> {
 
   @override
   Widget build(BuildContext context) {
+    print ("build>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
     screenSize ??= MediaQuery.of(context).size;
     size = (widget.size ?? screenSize);
     selectRadius = (widget.selectRadius ?? 10);
@@ -55,7 +56,7 @@ class ColorPickState extends State<ColorPickView> {
     assert((size != null && screenSize.width >= size.width), '控件宽度太宽');
     radius = size.width / 2 - padding;
     currentOffset ??= Offset(radius, radius);
-    if (widget.selectColor != null && selectPosition == null)
+    if (widget.selectColor != null)
       _setColor(widget.selectColor);
     _initLeftTop();
     return GestureDetector(
@@ -70,39 +71,40 @@ class ColorPickState extends State<ColorPickView> {
               painter: ColorPick(radius: radius),
               size: size,
             ),
-            Positioned(
-              left: isTap
-                  ? currentOffset.dx -
-                      (topLeftPosition == null
-                          ? 0
-                          : (topLeftPosition.dx + selectRadius / 2))
-                  : (selectPosition == null
-                      ? radius
-                      : selectPosition.dx + selectRadius / 2),
-              top: isTap
-                  ? currentOffset.dy -
-                      (topLeftPosition == null
-                          ? 0
-                          : (topLeftPosition.dy + selectRadius / 2))
-                  : (selectPosition == null
-                      ? radius
-                      : selectPosition.dy + selectRadius / 2),
-              //这里减去80，是因为上下边距各40 所以需要减去还有半径
-              child: Container(
-                width: selectRadius,
-                height: selectRadius,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(selectRadius),
-                  border:
-                      Border.fromBorderSide(BorderSide(color: selectRingColor)),
-                ),
-                child: ClipOval(
+            selectPosition != null ?
+                Positioned(
+                  left: isTap
+                      ? currentOffset.dx -
+                          (topLeftPosition == null
+                              ? 0
+                              : (topLeftPosition.dx + selectRadius / 2))
+                      : (selectPosition == null
+                          ? radius
+                          : selectPosition.dx + selectRadius / 2),
+                  top: isTap
+                      ? currentOffset.dy -
+                          (topLeftPosition == null
+                              ? 0
+                              : (topLeftPosition.dy + selectRadius / 2))
+                      : (selectPosition == null
+                          ? radius
+                          : selectPosition.dy + selectRadius / 2),
+                  //这里减去80，是因为上下边距各40 所以需要减去还有半径
                   child: Container(
-                    color: currentColor,
+                    width: selectRadius,
+                    height: selectRadius,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(selectRadius),
+                      border: Border.fromBorderSide(
+                          BorderSide(color: selectRingColor)),
+                    ),
+                    child: ClipOval(
+                      child: Container(
+                        color: currentColor,
+                      ),
+                    ),
                   ),
-                ),
-              ),
-            ),
+                ):Container(),
           ],
         ),
       ),
@@ -155,21 +157,36 @@ class ColorPickState extends State<ColorPickView> {
   void _setColor(Color color) {
     //设置颜色值
     var hsvColor = HSVColor.fromColor(color);
+    print("hsvColor:$hsvColor");
     double r = hsvColor.saturation * radius;
+    print("半径:$r");
     double radian = hsvColor.hue / -180.0 * pi;
+    print("弧度：$radius");
     _updateSelector(r * cos(radian), -r * sin(radian));
-    currentColor = color;
+    setState(() {
+      currentColor = color;
+    });
   }
 
   void _updateSelector(double eventX, double eventY) {
+    print("坐标（x = $eventX , y = $eventY )");
     //更新选中颜色值
     double r = sqrt(eventX * eventX + eventY * eventY);
+    print("r值：$r");
     double x = eventX, y = eventY;
+    print("x值：$x");
     if (r > radius) {
       x *= radius / r;
       y *= radius / r;
     }
-    selectPosition = new Offset(x + radius + padding, y + radius + padding);
+
+    print("判断后r值：$r");
+    print("判断后x值：$x");
+    setState(() {
+      // selectPosition = new Offset(x + radius + padding, y + radius + padding);
+      selectPosition = new Offset(x + radius, y + radius );
+    });
+    print("selectPosition设置:$selectPosition");
   }
 
   Color getColorAtPoint(double eventX, double eventY) {

@@ -1,5 +1,5 @@
-import 'package:color_pick/ring_color_pick.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 
 import 'color_pick.dart';
 
@@ -26,9 +26,10 @@ class CirclePageState extends State<CirclePage> {
           child: Column(
         children: <Widget>[
           ColorPickView(
-            selectColor: Color(0xff00eaff),
-            selectRadius: 30,
-            padding: 100,
+            size: Size(200, 200),
+            selectColor: currentColor,
+            selectRadius: 10,
+            padding: 10,
             selectRingColor: Colors.black,
             selectColorCallBack: (color) {
               setState(() {
@@ -37,10 +38,97 @@ class CirclePageState extends State<CirclePage> {
             },
           ),
           Container(
-            color: currentColor,
-            height: 50,
-            width: 50,
-            child: SizedBox(),
+            height: 200,
+            width: 300,
+            child: Column(
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  color: currentColor,
+                ),
+                Expanded(
+
+                    child: Slider(
+                  min: 0,
+                  max: 255,
+                  activeColor: Colors.red,
+                  inactiveColor: Colors.red,
+                  value: currentColor.red.toDouble(),
+                  onChanged: (double value) {
+                    setState(() {
+                      currentColor = currentColor.withRed(value.round());
+                    });
+                  },
+                )),
+                Expanded(
+                    child: Slider(
+                  min: 0,
+                  max: 255,
+                  activeColor: Colors.green,
+                  inactiveColor: Colors.green,
+                  value: currentColor.green.toDouble(),
+                  onChanged: (double value) {
+                    setState(() {
+                      currentColor = currentColor.withGreen(value.round());
+                    });
+                  },
+                )),
+                Expanded(
+                    child: Slider(
+                  min: 0,
+                  max: 255,
+                  activeColor: Colors.blue,
+                  inactiveColor: Colors.blue,
+                  value: currentColor.blue.toDouble(),
+                  onChanged: (double value) {
+                    setState(() {
+                      currentColor = currentColor.withBlue(value.round());
+                      print("blue>>>> $currentColor");
+                    });
+                  },
+                )),
+                Expanded(
+                    child: Slider(
+                  min: 0,
+                  max: 360,
+                  activeColor: Colors.deepPurple,
+                  inactiveColor:Colors.deepPurple,
+                  value:HSVColor.fromColor( currentColor).hue,
+                  onChanged: (double value) {
+                    setState(() {
+                      print("Hue value>>>> $value");
+                      HSVColor hsv = HSVColor.fromColor(currentColor);
+                      print("Hue hsv>>>> $hsv");
+                      HSVColor hsvs = hsv.withHue(value);
+                      print("Hue hsvs>>>> $hsvs");
+                      currentColor = hsvs.toColor();
+                      print("Hue>>>> $currentColor");
+                    });
+                  },
+                )),
+                Expanded(
+                    child: Slider(
+                  min: 0,
+                  max: 100,
+                  activeColor: Colors.black,
+                  inactiveColor:Colors.black,
+                  value:HSVColor.fromColor( currentColor).saturation * 100,
+                  onChanged: (double value) {
+                    setState(() {
+                      print("Saturation value>>>> $value");
+                      HSVColor hsv = HSVColor.fromColor(currentColor);
+                      print("Saturation hsv>>>> $hsv");
+                      HSVColor hsvs = hsv.withSaturation(value/100);
+                      print("Saturation hsvs>>>> $hsvs");
+                      currentColor = hsvs.toColor();
+                      print("Saturation>>>> $currentColor");
+                    });
+                  },
+                )),
+
+              ],
+            ),
           )
         ],
       )),
